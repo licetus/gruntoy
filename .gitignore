@@ -1,0 +1,17 @@
+# 本机构建产物：宿主侧测试二进制、日志与编译告警文件
+test/build/
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# 编辑器与 IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Arduino 构建临时目录
+build/
