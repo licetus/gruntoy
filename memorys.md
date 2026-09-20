@@ -20,8 +20,9 @@
 | 项目名 | **gruntoy v1.0** —— 毛绒电子宠物 · 体感子系统基线固件 |
 | 技术栈 | ESP32 / Arduino C++17 / 平台无关本机测试（g++） |
 | 交付位置 | `./gruntoy/` |
+| 远端仓库 | **https://github.com/licetus/gruntoy**（public，`main`，SSH 远端） |
 | 上游材料 | WorkBuddy 资料库「gruntoy设计方案」文件夹（23 个子节点） |
-| 当前状态 | ✅ **v1.0 已完成交付**：6 套件 264 断言全绿，0 编译告警 |
+| 当前状态 | ✅ **v1.0 已交付并上线**：6 套件 264 断言全绿，0 编译告警，远端 `main` @ `7d8bdd6` |
 | 阻塞项 | 无。下一步是硬件验证（非代码工作） |
 
 **一句话定位**：把 PRD v1.1 的「呼吸 / 咕噜 / 心情值 / 摇尾分级 / 平滑过渡」五项机制，
@@ -45,8 +46,12 @@ gruntoy/
 ├── cli.h/.cpp          串口调试台（编译期可整体移除）
 ├── docs/               5 篇交付文档（01 设计意图 → 05 CHANGELOG）
 ├── README.md           快速上手：验证 / 接线 / 烧录 / 命令 / 调参流程
+├── memorys.md          本文件的仓库副本（随仓库分发，改动后需同步并重新推送）
 └── test/               Arduino 桩 + 断言框架 + 6 套件 + run_tests.sh
 ```
+
+> **仓库根目录 = `gruntoy/` 目录**。`.gitignore` 排除 `test/build/`（宿主侧测试二进制与日志）。
+> 远端 `origin` 走 **SSH**（`git@github.com:licetus/gruntoy.git`），**不要改成 HTTPS 带令牌的写法**。
 
 ### 2.2 必须遵守的工程约定
 
@@ -160,6 +165,55 @@ gruntoy/
 
 量产配置产物 95,648 字节 / 调试配置 113,184 字节（差 17.5 KB，验证 `FIX-09`）。
 
+### 2026-09-21 · 任务二：GitHub 仓库上线 ✅ 已完成
+
+**任务来源**：用户指令「在 github 新建 gruntoy 仓库，把产物都上传」。
+
+**执行过程**
+
+1. **认证链路排查**（三步才找对路）
+   - `gh` CLI **未安装**；`git config --global` **为空**（无 `user.name` / `user.email`）。
+   - macOS keychain **无** github.com 的 https 凭据（`git credential fill` 会交互式索要用户名，
+     非交互环境下直接挂起）。既有仓库 `xingce-assistant` 的 remote 是 SSH。
+   - `~/.ssh` 受沙箱拦截（`ls` 报 `Operation not permitted`），但 `ssh -T git@github.com`
+     仍可正常认证为 **`licetus`** → SSH 推送通道可用。
+   - WorkBuddy GitHub 连接器的 MCP 工具**未注册进 `ToolSearch` 索引**（精确名查询返回 “Not found”），
+     但可用 `DeferExecuteTool` **直接调用成功**（`mcp__github__get_me` 返回 `licetus` / id `22375749`）。
+
+2. **建仓受阻与解决**
+   - `mcp__github__create_repository` 返回 `403 Resource not accessible by integration`。
+     根因：连接器使用的是 **GitHub App 安装令牌**，权限集中不含 `administration: write`，**无法建仓**。
+   - 用户确认走 **PAT 路线**：classic token（scope `repo`）经 REST API
+     `POST /user/repos` 建仓成功（HTTP 201）。
+   - 可见性由用户选定为 **public**；`memorys.md` 由用户确认 **一并入库**。
+
+3. **推送**：远端用 **SSH**（`git@github.com:licetus/gruntoy.git`），
+   **PAT 不写入 `.git/config`、不落盘、不回显**，仅用于那一次 API 调用。
+
+4. **验证**：本地 `main` 与 `origin/main` 同为 `7d8bdd6`；远端 31 个文件；
+   仓库内 0 处 `ghp_` 残留、`git config` 无令牌；推送后重跑 `bash test/run_tests.sh`
+   仍 **6 套件 264 断言全绿 / 0 告警**。
+
+**关键结论（下次直接沿用）**
+
+| 项 | 结论 |
+|---|---|
+| 仓库地址 | https://github.com/licetus/gruntoy |
+| 可见性 / 默认分支 | public / `main` |
+| 首个提交 | `7d8bdd6`，31 文件 / 7021 行 |
+| 远端协议 | **SSH**，remote 名 `origin` |
+| 入库范围 | `gruntoy/` 全部产物 + `memorys.md` |
+| 排除内容 | `test/build/`、`.DS_Store`、编辑器目录（见 `.gitignore`） |
+
+**坑位记录（重要）**
+
+- **建仓只能用带 `repo` scope 的 PAT 走 REST API，或由用户在网页手建空仓库**。
+  GitHub 连接器的 App 令牌只能读写已有仓库内容，**建不了仓库**。
+- 新建仓库**必须单独设置本地 git 身份**（全局配置为空）。本仓库设为
+  `licetus` / `22375749+licetus@users.noreply.github.com`。
+- 连接器的 GitHub MCP 工具要**用 `DeferExecuteTool` 直接调**，`ToolSearch` 索引不覆盖它们。
+- 提交前必须核对 `.gitignore` 生效（本次 31 个文件入库、`test/build/` 下 19 个产物被排除）。
+
 ---
 
 ## 5. 下一步待办
@@ -174,8 +228,14 @@ gruntoy/
 | P1 | 电池 ADC 接入，启用 `LOWPOWER` 态（`OP-03`） | 分压电路 | 硬件 + 固件 |
 | P2 | 云端参数下发通道（`OP-04`） | 协议与鉴权方案 | 固件 |
 | P2 | NFC 周边联动 | 产品方向确认 | 固件 |
+| P2 | 远端仓库加 GitHub Actions：push 时自动跑 `test/run_tests.sh`（对齐 `xingce-assistant` 的 CI 习惯） | 无 | 固件 |
 
 **新对话开工提示**：若继续 gruntoy 项目，先读
 `gruntoy/README.md` §2 目录结构 + `gruntoy/docs/04-验证与交接说明.md` §5~§6
 （门禁前必做动作与已知限制），再按 §5 表格推进。改动代码后**必须**跑
 `bash test/run_tests.sh`，要求 264/264 全绿且 0 编译告警。
+
+**仓库同步约定**：本文件在仓库内有一份副本 `gruntoy/memorys.md`。
+更新本文件后，需 `cp memorys.md gruntoy/memorys.md` 并提交推送到
+`licetus/gruntoy`，否则远端记录会落后于本地。推送前先 `git status` 确认
+`test/build/` 未被纳入。
