@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gruntoy M1 原型现场记录表</title>
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --line:#c9ccd1;
+    --line-strong:#8b9099;
+    --head:#f2f4f7;
+    --paper:#ffffff;
+    --muted:#6b7280;
+    --accent:#b91c1c;
+    --hint:#eef2ff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#e8eaed;color:var(--ink);}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:10.5pt;
+    line-height:1.5;
+  }
+  .sheet{
+    background:var(--paper);
+    max-width:210mm;
+    margin:0 auto;
+    padding:14mm 12mm 18mm;
+    box-shadow:0 2px 14px rgba(0,0,0,.18);
+  }
+  header.doc-head{
+    border-bottom:2.5px solid var(--ink);
+    padding-bottom:8px;
+    margin-bottom:6px;
+  }
+  header.doc-head h1{
+    font-size:16pt;margin:0 0 4px;letter-spacing:.5px;
+  }
+  header.doc-head .sub{font-size:9.5pt;color:var(--muted);}
+  .meta-bar{
+    display:flex;flex-wrap:wrap;gap:0 22px;
+    font-size:9.5pt;color:#374151;
+    margin:8px 0 14px;
+    padding:7px 10px;border:1px solid var(--line);
+    background:#fafbfc;
+  }
+  .meta-bar span b{font-weight:600;}
+  .field{display:inline-block;min-width:78px;border-bottom:1px dotted var(--line-strong);}
+
+  .toolbar{
+    max-width:210mm;margin:0 auto;padding:10px 12mm;
+    display:flex;gap:10px;align-items:center;justify-content:flex-end;
+    background:#dfe3e8;font-size:10pt;
+  }
+  .toolbar button{
+    font:inherit;padding:6px 14px;border:1px solid #6b7280;border-radius:4px;
+    background:#fff;cursor:pointer;
+  }
+  .toolbar button:hover{background:#f3f4f6;}
+  .toolbar .note{color:#4b5563;margin-right:auto;}
+
+  section.form{
+    margin:0 0 13px;
+    break-inside:avoid;page-break-inside:avoid;
+  }
+  section.form h2{
+    font-size:11.5pt;
+    margin:0 0 5px;
+    padding:4px 8px;
+    background:var(--head);
+    border-left:3.5px solid var(--ink);
+    display:flex;justify-content:space-between;align-items:baseline;
+    gap:10px;
+  }
+  section.form h2 .use{
+    font-size:8.5pt;font-weight:400;color:var(--muted);
+  }
+  .hint{
+    font-size:8.8pt;color:#374151;background:var(--hint);
+    border-left:2.5px solid #6366f1;
+    padding:4px 8px;margin:0 0 5px;
+  }
+  .hint.warn{background:#fef2f2;border-left-color:var(--accent);}
+  table{
+    width:100%;border-collapse:collapse;font-size:9.3pt;
+    break-inside:avoid;page-break-inside:avoid;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:4px 5px;
+    vertical-align:top;
+    text-align:left;
+  }
+  thead th{background:var(--head);font-weight:600;white-space:nowrap;}
+  td.fill{min-height:19px;height:19px;}
+  td[contenteditable]:focus{outline:2px solid #6366f1;outline-offset:-2px;background:#f8faff;}
+  td.c{text-align:center;}
+  td.judge{background:#fffdf5;font-weight:600;}
+  .tag{
+    display:inline-block;font-size:8pt;line-height:1.35;
+    padding:1px 5px;border:1px solid var(--line-strong);border-radius:3px;
+    background:#fff;white-space:nowrap;
+  }
+  .tag.p0{border-color:var(--accent);color:var(--accent);font-weight:600;}
+  .cmd{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:8.8pt;background:#f3f4f6;padding:0 3px;border-radius:2px;
+  }
+  .pagebreak{break-after:page;page-break-after:always;height:0;}
+
+  @media print{
+    @page{size:A4 portrait;margin:11mm 10mm;}
+    html,body{background:#fff;}
+    .toolbar{display:none !important;}
+    .sheet{box-shadow:none;margin:0;max-width:none;padding:0;width:auto;}
+    section.form{margin-bottom:9px;}
+    td.fill{height:20px;}
+    td[contenteditable]:focus{outline:none;background:transparent;}
+    thead{display:table-header-group;}
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="note">表格可直接在屏幕上填写（点击单元格输入），再打印。建议打印设置：A4 纵向、缩放 100%、关闭浏览器页眉页脚。</span>
+  <button onclick="window.print()">打印 / 存为 PDF</button>
+</div>
+
+<div class="sheet">
+
+<header class="doc-head">
+  <h1>gruntoy M1 原型现场记录表</h1>
+  <div class="sub">配套文档：<span class="cmd">docs/06-原型开发指南.md</span> ｜ 固件版本：v1.0（<span class="cmd">PARAMS_NVS_SCHEMA = 2</span>）</div>
+</header>
+
+<div class="meta-bar">
+  <span><b>记录人</b> <span class="field"></span></span>
+  <span><b>日期</b> <span class="field"></span></span>
+  <span><b>环境本底噪声</b> <span class="field"></span> dB</span>
+  <span><b>声级计型号</b> <span class="field"></span></span>
+  <span><b>固件配置</b> 调试 / 量产</span>
+</div>
+
+<!-- 1 -->
+<section class="form">
+  <h2>表 1 · 环境本底噪声基线 <span class="use">Day 1 · 不先测这张表，后面所有噪声数据都无效</span></h2>
+  <div class="hint warn">目标：本底噪声 <b>≤35dB</b>。若本底已达 45dB（临街、空调、冰箱），咕噜 ≤45dB 的判据将失去意义——须换房间或关闭噪声源后重测。</div>
+  <table>
+    <thead><tr><th style="width:26%">测点</th><th style="width:14%">本底(dB)</th><th style="width:16%">设备运行中(dB)</th><th>干扰源 / 备注</th></tr></thead>
+    <tbody>
+      <tr><td>桌面（马达位置，30cm）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>耳侧（贴脸距离）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>关闭空调/风扇后</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>夜间（最低环境噪声）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 2 -->
+<section class="form">
+  <h2>表 2 · 马达裸测记录 <span class="use">Day 2 · 找起转阈值与最安静工作点</span></h2>
+  <div class="hint"><span class="cmd">t bare &lt;duty&gt;</span> ／ <span class="cmd">t barestop</span></div>
+  <table>
+    <thead><tr><th style="width:12%">占空比</th><th style="width:13%">是否转动</th><th style="width:13%">噪声(dB)</th><th style="width:14%">手感强度(1~5)</th><th style="width:16%">是否异响/嗡鸣</th><th>备注</th></tr></thead>
+    <tbody>
+      <tr><td class="c">5%</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">10%</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">15%</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">20%</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">30%</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">50%</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">70%</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">100%</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">★ 稳定起转阈值（占空比）</td><td class="fill" contenteditable></td><td style="width:22%;background:#fafbfc">含义：嗡鸣区上界，P-41 取 0 的依据</td></tr>
+      <tr><td class="judge">★ 噪声最小工作点</td><td class="fill" contenteditable></td><td style="background:#fafbfc">候选呼吸峰值</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 3 -->
+<section class="form">
+  <h2>表 3 · 波谷 A/B 对比（关键实验） <span class="use">Day 2 · 验证 C-18 谷底必须为 0</span></h2>
+  <div class="hint"><span class="cmd">t trough 0</span>（A：完全断电） vs <span class="cmd">t trough 20</span>（B：保留 20%）。<b>判据：A 比 B 噪声低 ≥3dB。</b>此命令故意绕过 C-18，仅供实验。</div>
+  <table>
+    <thead><tr><th style="width:20%">组别</th><th style="width:16%">噪声(dB)</th><th style="width:20%">是否能听到嗡鸣</th><th style="width:18%">指腹能否感知停顿</th><th>备注</th></tr></thead>
+    <tbody>
+      <tr><td>A：谷底 0%（完全断电）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>B：谷底 20%（保留残量）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="judge">★ A − B 差值</td><td class="fill" contenteditable></td><td colspan="3" class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">结论：C-18 是否应强制</td><td class="fill" contenteditable></td><td style="width:30%;background:#fafbfc">达标 → 实证；差值 &lt;3dB → 复核规则必要性</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 4 -->
+<section class="form">
+  <h2>表 4 · 毛绒衰减记录 <span class="use">Day 3 · 核心实验，产出第一个关键数字</span></h2>
+  <div class="hint">填「可感知 / 勉强 / 不可感知」+ 强度分(1~5)。<b>关键判据：S4 在 70% 占空比下必须可感知</b>，否则 P-40（呼吸峰值 40%）需上调。</div>
+  <table>
+    <thead>
+      <tr><th style="width:9%">样品</th><th style="width:20%">构成</th><th style="width:11%">30%</th><th style="width:11%">50%</th><th style="width:11%">70%</th><th style="width:11%">100%</th><th style="width:11%">噪声(dB)</th><th>备注</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="c">S1</td><td>裸机</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">S2</td><td>3mm 短绒单层</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">S3</td><td>8mm 长绒单层</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">S4</td><td>8mm 长绒 + 10mm 填充棉</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">★ 毛绒吸声是否成立（S3 比 S1 低 ≥3dB）</td><td class="fill" contenteditable></td><td style="width:30%;background:#fafbfc">不成立 → M2 结构需加减振垫</td></tr>
+      <tr><td class="judge">★ 目标厚度下可感知的最低占空比</td><td class="fill" contenteditable></td><td style="background:#fafbfc">校准 P-40 的依据</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 5 -->
+<section class="form">
+  <h2>表 5 · 呼吸包络调参记录 <span class="use">Day 4 · 含「生物感」假设验证</span></h2>
+  <div class="hint"><span class="cmd">t breath 1|2|3</span>（L1=25% / L2=40% / L3=60%） ／ <span class="cmd">SET breath_period_ms 3000|4000|5000</span> ／ <span class="cmd">SET breath_period_jitter_pct 0|15</span></div>
+  <table>
+    <thead><tr><th style="width:16%">周期</th><th style="width:20%">抖动设置</th><th style="width:16%">像呼吸程度(1~5)</th><th style="width:18%">响应延迟(s)</th><th style="width:16%">噪声(dB)</th><th>被试原话</th></tr></thead>
+    <tbody>
+      <tr><td class="c">3s</td><td>关（0%）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">3s</td><td>开（15%）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">4s</td><td>关（0%）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">4s</td><td>开（15%）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">5s</td><td>关（0%）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">5s</td><td>开（15%）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">★ 选定周期 → P-37</td><td class="fill" contenteditable></td><td style="width:30%;background:#fafbfc">写入 <span class="cmd">SET breath_period_ms</span></td></tr>
+      <tr><td class="judge">★ 抖动是否让手感「更活」</td><td class="fill" contenteditable></td><td style="background:#fafbfc">无效 → 可从 PRD 移除该设计，简化代码</td></tr>
+      <tr><td class="judge">响应延迟是否 ≤0.5s（FR-35）</td><td class="fill" contenteditable></td><td style="background:#fafbfc">超时需查触发链路</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 6 -->
+<section class="form">
+  <h2>表 6 · 咕噜扫频记录（核心产出） <span class="use">Day 5 · 交付 P-32 实测最优值</span></h2>
+  <div class="hint">单点用 <span class="cmd">t gate &lt;Hz&gt;</span>（区间 20~60Hz，<span class="cmd">t gate 99</span> 会被 C-09 拒绝）；自动扫用 <span class="cmd">t sweep</span>（每点 10s，<span class="cmd">t sweepstop</span> 停止）。<b>每个频点贴耳听 30s 再打分。</b></div>
+  <table>
+    <thead><tr><th style="width:11%">频率(Hz)</th><th style="width:15%">猫感评分(1~5)</th><th style="width:13%">噪声(dB)</th><th style="width:17%">认为像猫的人数</th><th>主观描述（像什么 / 哪里不像）</th></tr></thead>
+    <tbody>
+      <tr><td class="c">25</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">30</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">35</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">40</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">45</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">50</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">其他</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">★ 猫感/噪声平衡点（选定 Hz）</td><td class="fill" contenteditable></td><td style="width:30%;background:#fafbfc">写入 <span class="cmd">SET purr_drive_freq_hz &lt;Hz×100&gt;</span></td></tr>
+      <tr><td class="judge">长包络（10~20s 缓变）是否更像活物</td><td class="fill" contenteditable></td><td style="background:#fafbfc"><span class="cmd">SET purr_long_envelope_ms</span></td></tr>
+      <tr><td class="judge">骤停（淡出 0ms）是否明显突兀</td><td class="fill" contenteditable></td><td style="background:#fafbfc"><span class="cmd">SET purr_fadeout_ms 800|0</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 7 -->
+<section class="form">
+  <h2>表 7 · 噪声实测记录（门禁证据） <span class="use">Day 2/3/5 · 汇总入 M1 门禁</span></h2>
+  <div class="hint warn">呼吸 ≤40dB、咕噜 ≤45dB（@30cm）。<b>必须用声级计，手机 App 在低频段误差过大。</b></div>
+  <table>
+    <thead><tr><th style="width:20%">模式</th><th style="width:16%">环境本底(dB)</th><th style="width:16%">实测值(dB)</th><th style="width:13%">限值</th><th style="width:12%">是否达标</th><th>备注</th></tr></thead>
+    <tbody>
+      <tr><td>待机（基准）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">—</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>呼吸（L2，谷底 0%）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">≤40</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>咕噜（扫频最优点）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">≤45</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>咕噜（最吵频点）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">≤45</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>摇尾马达（若已接）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">≤45</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="pagebreak"></div>
+
+<!-- 8 -->
+<section class="form">
+  <h2>表 8 · 盲测记录表（门禁直接证据） <span class="use">Day 6 · 被试不能是参与调试的人</span></h2>
+  <div class="hint warn">判据：<b>咕噜辨识率 ≥70%</b>（8 人中 ≥6 人正确）。未达标 → 触发 RK-20，评估换 LRA 方案。</div>
+  <table>
+    <thead><tr><th style="width:9%">被试</th><th style="width:13%">咕噜辨识</th><th style="width:13%">呼吸感知</th><th style="width:14%">偏好样品</th><th style="width:15%">是否养猫</th><th>开放式评价（哪里不像）</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">2</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">3</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">4</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">5</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">6</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">7</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">8</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="judge">合计</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td colspan="3" class="fill" contenteditable></td></tr>
+      <tr><td class="judge">辨识率</td><td class="fill" contenteditable></td><td colspan="4" style="background:#fafbfc">算式：正确人数 ÷ 被试总数 × 100%（≥70% 达标）</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 9 -->
+<section class="form">
+  <h2>表 9 · 心情值时序记录 <span class="use">Day 7 ~ 8 · 验证触发、降落、冷却、持久化</span></h2>
+  <div class="hint"><span class="cmd">t feed [n] [ms]</span>（非阻塞）／ <span class="cmd">t cycle</span> ／ <span class="cmd">t mood &lt;v&gt;</span> ／ <span class="cmd">status</span>。判据：70→100 需 <b>1~3 分钟</b>。</div>
+  <table>
+    <thead><tr><th style="width:30%">项目</th><th style="width:20%">理论/默认值</th><th style="width:20%">实测值</th><th>是否达标 / 备注</th></tr></thead>
+    <tbody>
+      <tr><td>开机初始心情值</td><td class="c">60</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>70 → 100 所需时长</td><td class="c">1~3 分钟</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>触发阈值</td><td class="c">100</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>咕噜时长（触发点）</td><td class="c">20s（估算）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>降落总时长</td><td class="c">5000ms</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>降落是否平滑（无跳变）</td><td class="c">是</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>降落期抚摸反馈（柔震）</td><td class="c">200ms</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>冷却时长</td><td class="c">90s</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>冷却期抚摸反馈（拒绝震）</td><td class="c">300ms</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>咕噜期间摇尾是否锁 W4</td><td class="c">是</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>轮次间隔闸门 (P-30)</td><td class="c">15s</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>累计上限闸门 (P-31)</td><td class="c">300s</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>断电后参数是否保持</td><td class="c">保持</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="judge">★ 规则拒绝演示（<span class="cmd">SET mood_restore_value 100</span> → C-02）</td><td class="c">被拒绝</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 10 -->
+<section class="form">
+  <h2>表 10 · 现成机芯拆解记录 <span class="use">摇尾 Day 1-2 · 产出规避设计输入</span></h2>
+  <div class="hint warn">摆动频率用 <b>手机 120fps 慢动作数 10 秒次数</b>（±5%，免费）。传动形式若为「曲柄-连杆-摇杆」或「双减速箱+摇杆」→ 标注「不可直接采用」。</div>
+  <table>
+    <thead><tr><th style="width:13%">机芯</th><th style="width:13%">动作类型</th><th style="width:11%">摆动频率</th><th style="width:17%">传动形式</th><th style="width:12%">噪声/电流</th><th style="width:13%">是否撞已知专利</th><th>可借鉴点</th></tr></thead>
+    <tbody>
+      <tr><td>A1 兆益 ZY-T005</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>A2 仪征芯秀</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>A3 深圳劬丰</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>A4 天长振宇</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>A5 天长金王</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td>其他</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">★ 是否存在可用的现成方案</td><td class="fill" contenteditable></td><td style="width:30%;background:#fafbfc">全为固定频率单动作 → 确认必须自研</td></tr>
+      <tr><td class="judge">★ 供应商是否声明有专利</td><td class="fill" contenteditable></td><td style="background:#fafbfc">声明的路径即为要避开的路径</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 11 -->
+<section class="form">
+  <h2>表 11 · 频率可达性对比（核心表） <span class="use">摇尾 Day 3-7 · 门禁「W4 档 2.0Hz 可达性」</span></h2>
+  <div class="hint">舵机需带负载测（尾端挂 20~50g 模拟毛绒尾巴）。<b>SG90 理论极限约 1.6Hz，带载后更低。</b>用手机慢动作录像计数即可。</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:10%">档位</th><th style="width:9%">要求 Hz</th>
+        <th style="width:11%">SG90 空载</th><th style="width:11%">SG90 带载</th><th style="width:11%">MG90S 带载</th>
+        <th style="width:12%">N20(1:100)</th><th style="width:12%">N20(1:150)</th><th style="width:12%">N20(1:298)</th>
+        <th>结论</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="c">W1</td><td class="c">0.30</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">W2</td><td class="c">0.60</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">W3</td><td class="c">1.20</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">W4</td><td class="c">2.00</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="judge" colspan="2">堵转电流 (mA)</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="judge" colspan="2">回程间隙 (mm/°)</td><td colspan="7" class="fill" contenteditable></td></tr>
+      <tr><td class="judge" colspan="2">噪声 @各档 (dB)</td><td colspan="7" class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">★ 是否有方案达到 2.0Hz</td><td class="fill" contenteditable></td><td style="width:30%;background:#fafbfc">均不可达 → 调整 P-47，W4 降为 1.5Hz</td></tr>
+      <tr><td class="judge">★ 是否覆盖 0.3Hz 低频</td><td class="fill" contenteditable></td><td style="background:#fafbfc">需高减速比；舵机可做到</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 12 -->
+<section class="form">
+  <h2>表 12 · 选型评分表 <span class="use">摇尾 Day 11-14 · 门禁「选型结论」证据</span></h2>
+  <div class="hint">建议评分 1~5（5 最优）。供应链调研结论倾向：<b>9g 舵机为主，N20+AS5600 为备选</b>。注意舵机扭矩小，尾巴必须轻量化。</div>
+  <table>
+    <thead><tr><th style="width:22%">维度</th><th style="width:19%">SG90 / MG90S</th><th style="width:19%">N20 + AS5600</th><th style="width:19%">现成机芯贴牌</th><th>权重/说明</th></tr></thead>
+    <tbody>
+      <tr><td>成本</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td>舵机最低</td></tr>
+      <tr><td>频率覆盖（能否到 2.0Hz）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td>核心否决项</td></tr>
+      <tr><td>噪声</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td>目标 ≤45dB</td></tr>
+      <tr><td>回程间隙</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td>舵机闭环无间隙</td></tr>
+      <tr><td>寿命（1 万次后状态）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td>核心否决项</td></tr>
+      <tr><td>可控性 / 可编程性</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td>现成机芯 OTP 不可编程</td></tr>
+      <tr><td>专利风险</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td>现成机芯风险最高</td></tr>
+      <tr><td>供货稳定性</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td>—</td></tr>
+      <tr><td class="judge">综合（加权）</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">★ 最终选型</td><td class="fill" contenteditable></td><td style="width:30%;background:#fafbfc">舵机 / N20 / 机芯贴牌 / 其他</td></tr>
+      <tr><td class="judge">决策理由（3 条以内）</td><td colspan="2" class="fill" contenteditable style="height:38px"></td></tr>
+      <tr><td class="judge">是否需调整 P-47 频率</td><td colspan="2" class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 13 -->
+<section class="form">
+  <h2>表 13 · 寿命测试记录 <span class="use">摇尾 Day 8-10 · 门禁「≥1 万次不失效」</span></h2>
+  <div class="hint">1 万次 ≈ <b>1.7 小时</b>连续运行（0.6s/次），一晚上跑完；跑 3 轮（约 5 小时）达 3 万次。<b>另需单独安排「W4 档 2.0Hz 连续 30 分钟」</b>——PRD v1.1 的耐久要求。</div>
+  <table>
+    <thead><tr><th style="width:13%">累计次数</th><th style="width:14%">时间点</th><th style="width:12%">异响</th><th style="width:12%">卡顿</th><th style="width:13%">温升(℃)</th><th style="width:14%">电流(mA)</th><th>备注</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1,000</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">5,000</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">10,000</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">30,000</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+      <tr><td class="c">W4 连续 30min</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:5px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">★ 1 万次是否无失效</td><td class="fill" contenteditable></td><td style="width:30%;background:#fafbfc">失效 → 触发 RK-08</td></tr>
+      <tr><td class="judge">★ 磨损位置（拆解后填写）</td><td colspan="2" class="fill" contenteditable style="height:34px">这是自研机构「要加强哪里」的直接输入</td></tr>
+      <tr><td class="judge">失效模式（如有）</td><td colspan="2" class="fill" contenteditable></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 14 -->
+<section class="form">
+  <h2>表 14 · M1 门禁证据核对 <span class="use">收官 · 7 项全部有数据才算 M1 完成</span></h2>
+  <div class="hint">数据好不好是另一回事，<b>但必须有数据</b>。</div>
+  <table>
+    <thead><tr><th style="width:5%">#</th><th style="width:26%">门禁要求</th><th style="width:16%">证据形式</th><th style="width:12%">是否完成</th><th style="width:14%">数据摘要</th><th>对应表</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td>机构寿命 ≥1 万次不失效</td><td>寿命记录 + 磨损照片</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">表 13</td></tr>
+      <tr><td class="c">2</td><td>模式盲测可区分</td><td>盲测记录表</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">表 8</td></tr>
+      <tr><td class="c">3</td><td>呼吸噪声实测达标（≤40dB）</td><td>噪声记录表</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">表 7</td></tr>
+      <tr><td class="c">4</td><td>咕噜噪声实测达标（≤45dB）</td><td>噪声记录表</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">表 7</td></tr>
+      <tr><td class="c">5</td><td>咕噜辨识率 ≥70%</td><td>盲测合计行</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">表 8</td></tr>
+      <tr><td class="c">6</td><td>摇尾执行器选型结论</td><td>选型评分表 + 理由</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">表 12</td></tr>
+      <tr><td class="c">7</td><td>W4 档 2.0Hz 可达性</td><td>频率对比表</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">表 11</td></tr>
+      <tr><td class="c">8</td><td>更新附录 C 参数默认值</td><td>PRD v1.2 附录 C</td><td class="fill" contenteditable></td><td class="fill" contenteditable></td><td class="c">表 2/4/5/6</td></tr>
+    </tbody>
+  </table>
+  <table style="margin-top:6px">
+    <tbody>
+      <tr><td class="judge" style="width:34%">三项否决性判据是否有触发</td><td class="fill" contenteditable style="height:30px" colspan="2">咕噜辨识率 &lt;70% → RK-20（评估 LRA）　｜　寿命失效 → RK-08（机构重做）　｜　找不到规避路径 → RK-01 升最高优先级</td></tr>
+      <tr><td class="judge">M1 门禁评审结论</td><td colspan="2" class="fill" contenteditable style="height:38px">是否进入 M2：</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer style="margin-top:14px;padding-top:8px;border-top:1.5px solid var(--ink);font-size:8.5pt;color:var(--muted)">
+  合规声明：本记录表为产品开发参考，具体实施请结合公司合规与法务要求确认。涉及专利规避的结论必须由具备资质的代理机构出具检索报告后确认，不得以拆解观察替代正式 FTO 检索。参数默认值以固件 <span class="cmd">params.cpp</span> 的 META 表为准（v1.0 / schema=2）。
+</footer>
+
+</div>
+</body>
+</html>
